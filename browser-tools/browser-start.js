@@ -3,6 +3,20 @@
 import { spawn, execSync } from "node:child_process";
 import puppeteer from "puppeteer-core";
 
+// Platform-specific configuration
+const PLATFORM_CONFIG = {
+	darwin: {
+		chromePath: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+		profilePath: `${process.env.HOME}/Library/Application Support/Google/Chrome/`,
+	},
+	linux: {
+		chromePath: "/usr/bin/chromium",
+		profilePath: `${process.env.HOME}/.config/chromium/`,
+	},
+};
+
+const config = PLATFORM_CONFIG[process.platform] || PLATFORM_CONFIG.linux;
+
 const useProfile = process.argv[2] === "--profile";
 
 if (process.argv[2] && process.argv[2] !== "--profile") {
@@ -45,14 +59,14 @@ if (useProfile) {
 			--exclude='*/Current Tabs' \
 			--exclude='*/Last Session' \
 			--exclude='*/Last Tabs' \
-			"${process.env.HOME}/Library/Application Support/Google/Chrome/" "${SCRAPING_DIR}/"`,
+			"${config.profilePath}" "${SCRAPING_DIR}/"`,
 		{ stdio: "pipe" },
 	);
 }
 
 // Start Chrome with flags to force new instance
 spawn(
-	"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+	config.chromePath,
 	[
 		"--remote-debugging-port=9222",
 		`--user-data-dir=${SCRAPING_DIR}`,
