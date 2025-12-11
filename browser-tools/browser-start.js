@@ -72,6 +72,8 @@ spawn(
 		`--user-data-dir=${SCRAPING_DIR}`,
 		"--no-first-run",
 		"--no-default-browser-check",
+		"--disable-dev-shm-usage", // Use /tmp instead of /dev/shm (prevent memory issues in devcontainers)
+    	"--no-sandbox",
 	],
 	{ detached: true, stdio: "ignore" },
 ).unref();
